@@ -1,5 +1,6 @@
 const router = require('express').Router();
 let ActiveTasksModel = require('../models/active_tasks.model');
+const timezoneOffset = new Date().getTimezoneOffset()*60*1000;
 
 router.route('/').get((req,res) => {
     ActiveTasksModel.find()
@@ -11,7 +12,7 @@ router.route('/add').post((req,res) => {
     const title = req.body.title;
     const course = req.body.course;
     const description = req.body.description;
-    const deadline = Date.parse(req.body.deadline);
+    const deadline = req.body.deadline;
 
     const newTask = new ActiveTasksModel({
         title, course, description, deadline
@@ -40,7 +41,7 @@ router.route('/update/:id').post((req,res) => {
             task.title = req.body.title;
             task.description = req.body.description;
             task.course = req.body.course;
-            task.deadline = Date.parse(req.body.deadline);
+            task.deadline = req.body.deadline;
 
             task.save()
                 .then(() => res.json('Task updated!'))
