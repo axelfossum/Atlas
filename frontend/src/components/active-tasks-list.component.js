@@ -73,6 +73,7 @@ export default class ActiveTasksList extends Component {
             .catch(err => {
                 console.log(err);
             });
+
     }
 
     deleteTask(id){
@@ -95,13 +96,15 @@ export default class ActiveTasksList extends Component {
                 currentTask_id: id,
                 currentTaskTitle: this.state.tasks.find(task => task._id === id).title,
                 currentTaskCourse: this.state.tasks.find(task => task._id === id).course,
-                currentTaskDeadline: new Date(this.state.tasks.find(task => task._id === id).deadline),
+                currentTaskDeadline: new Date(Date.parse(this.state.tasks.find(task => task._id === id).deadline) + this.state.timezoneOffset),
                 currentTaskDescription: this.state.tasks.find(task => task._id === id).description,
             });
+            console.log(this.state.currentTaskDeadline);
         } else {
             this.setState({
                 addingNewTask: true
             });
+            console.log(this.state.currentTaskDeadline);
         }
 
         this.setState({
@@ -143,17 +146,19 @@ export default class ActiveTasksList extends Component {
             deadline: this.state.currentTaskDeadline,
             course: this.state.currentTaskCourse
         }
-        console.log(task.deadline)
+
         if(this.state.addingNewTask){
             axios.post('http://localhost:5000/add/', task)
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorAddPost: ' + err));
         } else {
+            task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) + this.state.timezoneOffset);
             axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task)
             .then(res => console.log(res.data))
-            .catch(err => console.log('ErrorAddPost: ' + err));
+            .catch(err => console.log('ErrorUpdatePost: ' + err));
         }
-       window.location= '/'
+
+        window.location= '/';
     }
 
     render(){
