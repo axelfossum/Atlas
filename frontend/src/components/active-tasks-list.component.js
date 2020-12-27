@@ -85,7 +85,6 @@ export default class ActiveTasksList extends Component {
     }
 
     toggleModal(id){
-    
         if(id !== ''){
             this.setState({
                 addingNewTask: false,
@@ -96,6 +95,7 @@ export default class ActiveTasksList extends Component {
                 currentTaskDescription: this.state.tasks.find(task => task._id === id).description,
             });
         } else {
+            this.reset()
             this.setState({
                 addingNewTask: true
             });
@@ -105,6 +105,16 @@ export default class ActiveTasksList extends Component {
             showModal: !this.state.showModal,
         });
         
+    }
+
+    reset(){
+        this.setState({
+            currentTask_id: '',
+            currentTaskTitle: '',
+            currentTaskCourse: '',
+            currentTaskDescription: '',
+            currentTaskDeadline: new Date()
+        })     
     }
 
     onChangeCurrentTaskTitle(e){
