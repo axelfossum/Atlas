@@ -1,5 +1,6 @@
 
-/old
-/node_modules
+old/
+node_modules/
 
 .env
+.eslintcache
