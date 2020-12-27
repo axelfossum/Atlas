@@ -13,7 +13,7 @@ const Task = props => {
                         <div className="col-10">
                             <h5 className="card-title">{props.task.title}</h5>
                             <h6 className="card-subtitle mb-2 text-muted">{props.task.course}</h6>
-                            <h6 className="card-subtitle mb-2 text-muted">{props.task.deadline.substring(0,10)}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted">{props.task.deadline.substring(0,10) + " " + props.task.deadline.substring(11,16)}</h6>
                         </div>
                         <div className="col-2">
                             <button type="button" className="btn btn-outline-success btn-lg">✓</button>
@@ -45,7 +45,8 @@ export default class ActiveTasksList extends Component {
             currentTaskCourse: '',
             currentTaskDescription: '',
             currentTaskDeadline: new Date(),
-            addingNewTask: false
+            addingNewTask: false,
+            timezoneOffset: new Date().getTimezoneOffset()*60*1000
         };
 
         this.deleteTask = this.deleteTask.bind(this);
@@ -57,6 +58,8 @@ export default class ActiveTasksList extends Component {
         this.onEditTask = this.onEditTask.bind(this);
 
     }
+
+
     
     componentDidMount(){
 
@@ -140,7 +143,7 @@ export default class ActiveTasksList extends Component {
             deadline: this.state.currentTaskDeadline,
             course: this.state.currentTaskCourse
         }
-
+        console.log(task.deadline)
         if(this.state.addingNewTask){
             axios.post('http://localhost:5000/add/', task)
             .then(res => console.log(res.data))
@@ -150,8 +153,7 @@ export default class ActiveTasksList extends Component {
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorAddPost: ' + err));
         }
-        
-        window.location = '/';
+       window.location= '/'
     }
 
     render(){
@@ -212,7 +214,8 @@ export default class ActiveTasksList extends Component {
                                             className="form-control"
                                             selected={this.state.currentTaskDeadline}
                                             showTimeSelect
-                                            dateFormat="dd/mm/yyyy HH:mm"
+                                            timeFormat="HH:mm"
+                                            dateFormat="dd/MM/yyyy HH:mm"
                                             onChange={this.onChangeCurrentTaskDeadline}
                                         />
                                     </div>
