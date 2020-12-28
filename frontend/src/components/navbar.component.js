@@ -6,8 +6,13 @@ export default class Navbar extends Component {
 
     render() {
         return (
-            <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
-                <Link to="/" className="navbar-brand">Study Planner</Link>
+            <nav className="navbar navbar-light navbar-expand-lg">
+                <a href="/" className="navbar-brand">
+                <img src={process.env.PUBLIC_URL + '/pen-small.svg'} alt="" width="50" height="50"></img>
+                {/* <Link to="/">
+                    <img src="/public/pen-small.svg" alt=""></img>
+                </Link> */}
+                </a>
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav mr-auto">
                         <li className="navbar-item">

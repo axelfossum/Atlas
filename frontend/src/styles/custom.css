@@ -18,3 +18,8 @@
 textarea {
     min-height: 150px;
 }
+
+.navbar {
+    background-color: #f2f4fb;
+    border-bottom: 1px solid #ccc;
+}
