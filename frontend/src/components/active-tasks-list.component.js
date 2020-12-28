@@ -16,7 +16,7 @@ const Task = props => {
                             <h6 className="card-subtitle mb-2 text-muted">{props.task.deadline.substring(0,10) + " " + props.task.deadline.substring(11,16)}</h6>
                         </div>
                         <div className="col-2">
-                            <button type="button" className="btn btn-outline-success btn-lg">✓</button>
+                            <button type="button" className="btn btn-outline-success btn-lg" onClick={() => props.toggleFinish(props.task._id)}>✓</button>
                         </div>
                     </div>
                     <div className="row">
@@ -56,6 +56,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskDeadline = this.onChangeCurrentTaskDeadline.bind(this);
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
+        this.toggleFinish = this.toggleFinish.bind(this);
 
     }
 
@@ -67,7 +68,7 @@ export default class ActiveTasksList extends Component {
             .then(response => {
                 this.setState({
                     isLoaded: true,
-                    tasks: response.data
+                    tasks: response.data.filter(el => el.finished == false)
                 });
             })
             .catch(err => {
@@ -82,6 +83,22 @@ export default class ActiveTasksList extends Component {
                 console.log(res.data);
             })
             .catch(err => console.log(err));
+
+        this.setState({
+            tasks: this.state.tasks.filter(el => el._id !== id)
+        });
+    }
+
+    toggleFinish(id){
+        const task = {
+            finished: !this.state.tasks.find(task => task._id === id).finished
+        }
+
+        axios.post('http://localhost:5000/update/'+ id, task)
+        .then(res => {
+            console.log(res.data);
+        })
+        .catch(err => console.log( "test" + err));
 
         this.setState({
             tasks: this.state.tasks.filter(el => el._id !== id)
@@ -197,7 +214,8 @@ export default class ActiveTasksList extends Component {
                     <button className="btn btn-primary btn-lg shadow" onClick={() => this.toggleModal('')}>+ &nbsp;Add new task</button>
                 </div>
                 <div className="row">
-                    {tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} deleteTask={this.deleteTask} showModal={this.toggleModal}/>)}
+                    {tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 
+                    deleteTask={this.deleteTask} showModal={this.toggleModal} toggleFinish={this.toggleFinish}/>) }
                 </div>
 
                 <Modal show={this.state.showModal} onHide={() => this.toggleModal('')} size="lg">
