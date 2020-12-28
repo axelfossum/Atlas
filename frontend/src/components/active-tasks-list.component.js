@@ -139,6 +139,7 @@ export default class ActiveTasksList extends Component {
         this.setState({
             currentTaskDeadline: deadline
         });
+        console.log(deadline);
     }
 
     onChangeCurrentTaskDescription(e){
@@ -153,16 +154,17 @@ export default class ActiveTasksList extends Component {
         const task = {
             title: this.state.currentTaskTitle,
             description: this.state.currentTaskDescription,
-            deadline: this.state.currentTaskDeadline,
             course: this.state.currentTaskCourse
         }
 
         if(this.state.addingNewTask){
+            task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) - this.state.timezoneOffset);
             axios.post('http://localhost:5000/add/', task)
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorAddPost: ' + err));
         } else {
-            task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) + this.state.timezoneOffset);
+            task.deadline = new Date(Date.parse(this.state.currentTaskDeadline));
+            console.log('New deadline: ' + task.deadline);
             axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task)
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorUpdatePost: ' + err));

@@ -41,10 +41,10 @@ router.route('/update/:id').post((req,res) => {
             task.title = req.body.title;
             task.description = req.body.description;
             task.course = req.body.course;
-            task.deadline = req.body.deadline;
+            task.deadline = new Date(Date.parse(req.body.deadline) - timezoneOffset);
 
             task.save()
-                .then(() => res.json('Task updated!'))
+                .then(() => res.json('Task updated! ' + task.deadline))
                 .catch(err => res.status(400).json(err));
         })
         .catch(err => res.status(400).json(err));
