@@ -19,7 +19,7 @@ export default class About extends Component {
                         <h5>Creators</h5>
                         <p className="creators mb-5">
                             Gabriel Christensson | Kungliga Tekniska Högskolan (KTH)<br/>
-                            Axel Fossum | Lunds Tekniska Universitet
+                            Axel Fossum | Lunds Tekniska Högskola (LTH)
                         </p>
                     </div>
                     <div class="col-3"></div>
