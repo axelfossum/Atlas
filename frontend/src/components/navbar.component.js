@@ -1,8 +1,31 @@
 
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios';
 
 export default class Navbar extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            nbrArchived: 0
+        }
+        this.getNbrArchived = this.getNbrArchived.bind(this);
+    }
+
+    getNbrArchived(){
+        axios.get('http://localhost:5000/')
+        .then(response => {
+            this.setState({
+            nbrArchived: response.data.filter(el => el.finished === true).length
+            })
+        })
+        .catch(err => {
+            console.log(err);
+        });
+        return this.state.nbrArchived
+    }
 
     render() {
         return (
@@ -16,7 +39,7 @@ export default class Navbar extends Component {
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav mr-auto clearfix">
                         <li className="navbar-item">
-                            <Link to="/" className="nav-link">Archived</Link>
+                        <Link to="/" className="nav-link">Archived <span className="badge badge-secondary ">{this.getNbrArchived()}</span></Link> 
                         </li>
                         <li className="navbar-item">
                             <Link to="/about" className="nav-link">About Atlas</Link>

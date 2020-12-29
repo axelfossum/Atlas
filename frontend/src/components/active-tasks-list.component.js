@@ -70,7 +70,7 @@ export default class ActiveTasksList extends Component {
             .then(response => {
                 this.setState({
                     isLoaded: true,
-                    tasks: response.data.filter(el => el.finished == false)
+                    tasks: response.data.filter(el => el.finished === false)
                 });
             })
             .catch(err => {
