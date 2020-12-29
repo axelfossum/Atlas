@@ -27,3 +27,15 @@ textarea {
 .creators {
     font-size: 13px;
 }
+
+.btn-purple {
+    color: #fff;
+    background-color: #922585;
+    border-color: #922585;
+}
+
+.btn-purple:hover {
+    color: #fff;
+    background-color: #852179;
+    border-color: #852179;
+}

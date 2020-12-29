@@ -6,9 +6,9 @@ export default class About extends Component {
     render(){
         return (
             <div className="container-fluid px-5 pt-5 text-center">
-                <div class="row">
-                    <div class="col-3"></div>
-                    <div class="col-6">
+                <div className="row">
+                    <div className="col-3"></div>
+                    <div className="col-6">
                         <h2>What is Atlas?</h2>
                         <p className="mb-5">
                             Atlas is an online tool for planning your studies. Think of Atlas as a bulletin board on which you can map out your 
@@ -22,7 +22,7 @@ export default class About extends Component {
                             Axel Fossum | Lunds Tekniska Högskola (LTH)
                         </p>
                     </div>
-                    <div class="col-3"></div>
+                    <div className="col-3"></div>
                 </div>
                 
             </div>
