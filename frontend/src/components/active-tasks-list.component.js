@@ -22,9 +22,9 @@ const Task = props => {
                     <div className="row">
                         <div className="col">
                             <p className="card-text overflow-auto">{props.task.description}</p>
-                            <button className="btn p-0 btn-link" onClick={() => props.showModal(props.task._id)}>Edit</button>
+                            <button className="btn p-0 btn-link" onClick={() => props.showModal(props.task._id)}>✎ Edit</button>
                             <div className="d-inline mx-2 btn-divider">|</div>
-                            <button className="btn p-0 btn-link" onClick={() => {props.deleteTask(props.task._id)}}>Delete</button>
+                            <button className="btn p-0 btn-link" onClick={() => {props.toggleDelete(props.task._id)}}>✗ Delete</button>
                         </div>
                     </div>
                 </div>
@@ -38,6 +38,7 @@ export default class ActiveTasksList extends Component {
 
         this.state = {
             showModal: false,
+            showConfirmDelete: false,
             isLoaded: false,
             tasks: [],
             currentTask_id: '',
@@ -49,7 +50,7 @@ export default class ActiveTasksList extends Component {
             timezoneOffset: new Date().getTimezoneOffset()*60*1000
         };
 
-        this.deleteTask = this.deleteTask.bind(this);
+        this.toggleDelete = this.toggleDelete.bind(this);
         this.toggleModal = this.toggleModal.bind(this);
         this.onChangeCurrentTaskTitle = this.onChangeCurrentTaskTitle.bind(this);
         this.onChangeCurrentTaskCourse = this.onChangeCurrentTaskCourse.bind(this);
@@ -57,6 +58,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
         this.toggleFinish = this.toggleFinish.bind(this);
+        this.confirmDelete = this.confirmDelete.bind(this);
 
     }
 
@@ -77,16 +79,29 @@ export default class ActiveTasksList extends Component {
 
     }
 
-    deleteTask(id){
-        axios.delete('http://localhost:5000/'+id)
-            .then(res => {
-                console.log(res.data);
-            })
-            .catch(err => console.log(err));
+    toggleDelete(id){
+        this.setState({
+            currentTask_id: id,
+            showConfirmDelete: !this.state.showConfirmDelete
+        });
+    }
+
+
+    confirmDelete(e){
+        e.preventDefault();
+
+        axios.delete('http://localhost:5000/'+this.state.currentTask_id)
+        .then(res => {
+            console.log(res.data);
+        })
+        .catch(err => console.log(err)); 
 
         this.setState({
-            tasks: this.state.tasks.filter(el => el._id !== id)
+            showConfirmDelete: !this.state.showConfirmDelete,
+            tasks: this.state.tasks.filter(el => el._id !== this.state.currentTask_id)
         });
+
+        window.location= '/';
     }
 
     toggleFinish(id){
@@ -98,7 +113,7 @@ export default class ActiveTasksList extends Component {
         .then(res => {
             console.log(res.data);
         })
-        .catch(err => console.log( "test" + err));
+        .catch(err => console.log(err));
 
         this.setState({
             tasks: this.state.tasks.filter(el => el._id !== id)
@@ -115,13 +130,11 @@ export default class ActiveTasksList extends Component {
                 currentTaskDeadline: new Date(Date.parse(this.state.tasks.find(task => task._id === id).deadline) + this.state.timezoneOffset),
                 currentTaskDescription: this.state.tasks.find(task => task._id === id).description,
             });
-            console.log(this.state.currentTaskDeadline);
         } else {
             this.reset()
             this.setState({
                 addingNewTask: true
             });
-            console.log(this.state.currentTaskDeadline);
         }
 
         this.setState({
@@ -156,7 +169,6 @@ export default class ActiveTasksList extends Component {
         this.setState({
             currentTaskDeadline: deadline
         });
-        console.log(deadline);
     }
 
     onChangeCurrentTaskDescription(e){
@@ -171,7 +183,8 @@ export default class ActiveTasksList extends Component {
         const task = {
             title: this.state.currentTaskTitle,
             description: this.state.currentTaskDescription,
-            course: this.state.currentTaskCourse
+            course: this.state.currentTaskCourse,
+            finished: false
         }
 
         if(this.state.addingNewTask){
@@ -181,7 +194,6 @@ export default class ActiveTasksList extends Component {
             .catch(err => console.log('ErrorAddPost: ' + err));
         } else {
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline));
-            console.log('New deadline: ' + task.deadline);
             axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task)
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorUpdatePost: ' + err));
@@ -203,19 +215,19 @@ export default class ActiveTasksList extends Component {
 
         let finalBtn;
         if(this.state.addingNewTask){
-            finalBtn = <button className="btn btn-success">Add new task</button>;
+            finalBtn = <button className="btn btn-purple">Add new task</button>;
         } else {
-            finalBtn = <button className="btn btn-success">Save changes</button>;
+            finalBtn = <button className="btn btn-purple">Save changes</button>;
         }
 
         return (
-            <div className="container-fluid px-5 pt-4">
+            <div className="container-fluid px-5 pt-4 main-atlas">
                 <div className="row my-3">
-                    <button className="btn btn-primary btn-lg shadow" onClick={() => this.toggleModal('')}>+ &nbsp;Add new task</button>
+                    <button className="btn btn-purple btn-lg shadow" onClick={() => this.toggleModal('')}>+ &nbsp;Add new task</button>
                 </div>
                 <div className="row">
                     {tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 
-                    deleteTask={this.deleteTask} showModal={this.toggleModal} toggleFinish={this.toggleFinish}/>) }
+                    toggleDelete={this.toggleDelete} showModal={this.toggleModal} toggleFinish={this.toggleFinish}/>) }
                 </div>
 
                 <Modal show={this.state.showModal} onHide={() => this.toggleModal('')} size="lg">
@@ -269,6 +281,19 @@ export default class ActiveTasksList extends Component {
                             <button type="button" className="btn btn-light" onClick={() => this.toggleModal('')}>Cancel</button>
                             {finalBtn}
                         </Modal.Footer>
+                    </form>
+                </Modal>
+                <Modal show={this.state.showConfirmDelete} onHide={() => this.toggleDelete('')}>
+                    <form onSubmit={this.confirmDelete}>
+                        <Modal.Body>
+                            <div className="p-2 text-center">
+                                Are you sure you want to delete this task?
+                                <br/>
+                                <br/>
+                                <button type="button" className="btn btn-secondary mr-2" onClick={() => this.toggleDelete(this.state.currentTask_id)}>Cancel</button>
+                                <button className="btn btn-danger ml-2">Confirm</button>
+                            </div>
+                        </Modal.Body>
                     </form>
                 </Modal>
             </div>

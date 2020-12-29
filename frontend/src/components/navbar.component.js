@@ -14,7 +14,7 @@ export default class Navbar extends Component {
                 </Link> */}
                 </a>
                 <div className="collapse navbar-collapse">
-                    <ul className="navbar-nav mr-auto">
+                    <ul className="navbar-nav mr-auto clearfix">
                         <li className="navbar-item">
                             <Link to="/" className="nav-link">Archived</Link>
                         </li>
@@ -22,6 +22,8 @@ export default class Navbar extends Component {
                             <Link to="/about" className="nav-link">About Atlas</Link>
                         </li>
                     </ul>
+                    <button type="button" className="btn px-4 btn-purple">Login</button>
+                    <button type="button" className="btn px-4 btn-outline-secondary ml-2">Register</button>
                 </div>
             </nav>
         );
