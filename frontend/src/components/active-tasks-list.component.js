@@ -86,6 +86,7 @@ export default class ActiveTasksList extends Component {
             .catch(err => {
                 console.log(err);
             });
+
     }
 
     toggleDelete(id){
@@ -220,12 +221,15 @@ export default class ActiveTasksList extends Component {
                     <h1 className="h1-lg mb-4">
                         Welcome to Atlas!
                     </h1>
+                    <div className="mb-7">
+                        <img src={process.env.PUBLIC_URL + '/pen-small.svg'} alt="" width="150" height="150"></img>
+                    </div>
                     <div>
                         <Link to="/login">
-                            <button type="button" className="btn btn-purple btn-lg px-5 mr-4">Sign in</button>
+                            <button type="button" className="btn btn-purple btn-lg px-5 mr-4 shadow">Sign in</button>
                         </Link>
                         <Link to="/register">
-                            <button type="button" className="btn btn-secondary btn-lg px-5">Register</button>
+                            <button type="button" className="btn btn-secondary btn-lg px-5 shadow">Register</button>
                         </Link>
                     </div>
                 </div>
