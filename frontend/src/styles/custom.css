@@ -48,6 +48,10 @@ textarea {
     padding-top: 100px;
 }
 
+.mb-7 {
+    margin-bottom: 70px;
+}
+
 h1, h2, h3 {
     font-family: 'Roboto Slab', serif;
 }
