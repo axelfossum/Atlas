@@ -73,7 +73,6 @@ export default class ArchivedTasksList extends Component {
             .catch(err => {
                 console.log(err);
             });
-            console.log(this.state.tasks)
     }
 
     render(){
