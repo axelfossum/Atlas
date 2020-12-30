@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/navbar.component";
 import ActiveTasksList from "./components/active-tasks-list.component";
+import ArchivedTasksList from "./components/archived-tasks-list.component";
 import About from "./components/about.component";
 import Login from "./components/login.component";
 import Register from "./components/register.component";
