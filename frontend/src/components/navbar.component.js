@@ -1,6 +1,7 @@
 
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import AuthOptions from '../components/authOptions';
 
 export default class Navbar extends Component {
 
@@ -8,10 +9,7 @@ export default class Navbar extends Component {
         return (
             <nav className="navbar navbar-light navbar-expand-lg">
                 <a href="/" className="navbar-brand">
-                <img src={process.env.PUBLIC_URL + '/pen-small.svg'} alt="" width="50" height="50"></img>
-                {/* <Link to="/">
-                    <img src="/public/pen-small.svg" alt=""></img>
-                </Link> */}
+                    <img src={process.env.PUBLIC_URL + '/pen-small.svg'} alt="" width="50" height="50"></img>
                 </a>
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav mr-auto clearfix">
@@ -22,8 +20,7 @@ export default class Navbar extends Component {
                             <Link to="/about" className="nav-link">About Atlas</Link>
                         </li>
                     </ul>
-                    <button type="button" className="btn px-4 btn-purple">Login</button>
-                    <button type="button" className="btn px-4 btn-outline-secondary ml-2">Register</button>
+                    <AuthOptions />
                 </div>
             </nav>
         );

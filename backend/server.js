@@ -20,10 +20,12 @@ connection.once('open', () => {
 });
 
 // Require router files
-const activeTasksRouter = require('./routes/tasks');
+const tasksRouter = require('./routes/tasks');
+const userRouter = require('./routes/userRouter');
 
 // Use router middleware
-app.use('/', activeTasksRouter);
+app.use('/', tasksRouter);
+app.use('/user', userRouter);
 
 // Server starts listening on port
 app.listen(port, () => {

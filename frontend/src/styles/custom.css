@@ -39,3 +39,7 @@ textarea {
     background-color: #852179;
     border-color: #852179;
 }
+
+.error-notice-btn, .error-notice-btn:hover {
+    color: inherit;
+}
