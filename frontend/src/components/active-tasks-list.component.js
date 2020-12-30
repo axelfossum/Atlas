@@ -86,7 +86,6 @@ export default class ActiveTasksList extends Component {
             .catch(err => {
                 console.log(err);
             });
-
     }
 
     toggleDelete(id){
