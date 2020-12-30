@@ -39,7 +39,7 @@ export default class Navbar extends Component {
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav mr-auto clearfix">
                         <li className="navbar-item">
-                        <Link to="/" className="nav-link">Archived <span className="badge badge-secondary ">{this.getNbrArchived()}</span></Link> 
+                        <Link to="/archived" className="nav-link">Archived <span className="badge badge-secondary ">{this.getNbrArchived()}</span></Link> 
                         </li>
                         <li className="navbar-item">
                             <Link to="/about" className="nav-link">About Atlas</Link>
