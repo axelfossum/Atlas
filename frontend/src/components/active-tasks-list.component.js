@@ -1,11 +1,11 @@
-import React, { Component, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { Component } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import '../styles/custom.css';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import UserContext from '../context/UserContext';
+import { Link } from 'react-router-dom'
 
 const Task = props => {
     return (
@@ -50,6 +50,7 @@ export default class ActiveTasksList extends Component {
             currentTaskDeadline: new Date(),
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
+            isLoggedIn: false
         };
 
         this.toggleDelete = this.toggleDelete.bind(this);
@@ -68,8 +69,12 @@ export default class ActiveTasksList extends Component {
     
     componentDidMount(){
 
-        const {userData} = this.context
-        if(!userData.user) window.location = '/login';
+        const tokenRes = localStorage.getItem('auth-token');
+        if(tokenRes){
+            this.setState({
+                isLoggedIn: true
+            });
+        }
 
         axios.get('http://localhost:5000/')
             .then(response => {
@@ -208,9 +213,27 @@ export default class ActiveTasksList extends Component {
     }
 
     render(){
-        const {isLoaded, tasks} = this.state;
+        const {isLoaded, tasks, isLoggedIn} = this.state;
 
-        if(!isLoaded){
+        if(!isLoggedIn){
+            return (
+                <div className="container-fluid px-5 pt-10 text-center">
+                    <h1 className="h1-lg mb-4">
+                        Welcome to Atlas!
+                    </h1>
+                    <div>
+                        <Link to="/login">
+                            <button type="button" className="btn btn-purple btn-lg px-5 mr-4">Sign in</button>
+                        </Link>
+                        <Link to="/register">
+                            <button type="button" className="btn btn-secondary btn-lg px-5">Register</button>
+                        </Link>
+                    </div>
+                </div>
+            );
+        }
+
+        if(!isLoaded && isLoggedIn){
             return (
                 <div className="container-fluid px-5 pt-4">
                     Loading...

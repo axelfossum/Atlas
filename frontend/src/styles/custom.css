@@ -43,3 +43,15 @@ textarea {
 .error-notice-btn, .error-notice-btn:hover {
     color: inherit;
 }
+
+.pt-10 {
+    padding-top: 100px;
+}
+
+h1, h2, h3 {
+    font-family: 'Roboto Slab', serif;
+}
+
+.h1-lg {
+    font-size: 50px;
+}
