@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import '../styles/custom.css';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import UserContext from '../context/UserContext';
 
 const Task = props => {
     return (
@@ -47,7 +49,7 @@ export default class ActiveTasksList extends Component {
             currentTaskDescription: '',
             currentTaskDeadline: new Date(),
             addingNewTask: false,
-            timezoneOffset: new Date().getTimezoneOffset()*60*1000
+            timezoneOffset: new Date().getTimezoneOffset()*60*1000,
         };
 
         this.toggleDelete = this.toggleDelete.bind(this);
@@ -62,9 +64,12 @@ export default class ActiveTasksList extends Component {
 
     }
 
-
+    static contextType = UserContext;
     
     componentDidMount(){
+
+        const {userData} = this.context
+        if(!userData.user) window.location = '/login';
 
         axios.get('http://localhost:5000/')
             .then(response => {
