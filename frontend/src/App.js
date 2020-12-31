@@ -52,6 +52,7 @@ function App() {
         <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
+        <Route path="/archived" component={ArchivedTasksList} />
       </UserContext.Provider>
     </Router>
   );
