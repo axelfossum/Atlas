@@ -66,7 +66,7 @@ export default class ArchivedTasksList extends Component {
         axios.get('http://localhost:5000/')
             .then(response => {
                 this.setState({
-                    tasks: response.data,
+                    tasks: response.data.filter(el => el.finished === true),
                     isLoaded: true
                 });
             })
