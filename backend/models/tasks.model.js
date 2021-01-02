@@ -6,6 +6,7 @@ const tasksSchema = new Schema({
     course: {type: String, required: false},
     description: {type: String, required: false},
     deadline: {type: Date, required: true},
+    user: {type: String, required: true},
     finished: {type: Boolean, required: true}
 }, {
     timestamps: true

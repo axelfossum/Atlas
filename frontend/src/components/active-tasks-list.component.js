@@ -4,7 +4,6 @@ import axios from 'axios';
 import '../styles/custom.css';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import UserContext from '../context/UserContext';
 import { Link } from 'react-router-dom'
 
 const Task = props => {
@@ -64,19 +63,17 @@ export default class ActiveTasksList extends Component {
         this.confirmDelete = this.confirmDelete.bind(this);
 
     }
-
-    static contextType = UserContext;
     
     componentDidMount(){
 
-        const tokenRes = localStorage.getItem('auth-token');
-        if(tokenRes){
+        const token = localStorage.getItem('auth-token');
+        if(token){
             this.setState({
                 isLoggedIn: true
             });
         }
 
-        axios.get('http://localhost:5000/')
+        axios.get('http://localhost:5000/', { headers: {'x-auth-token': token} })
             .then(response => {
                 this.setState({
                     isLoaded: true,
@@ -197,14 +194,16 @@ export default class ActiveTasksList extends Component {
             finished: false
         }
 
+        const token = localStorage.getItem('auth-token');
+
         if(this.state.addingNewTask){
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) - this.state.timezoneOffset);
-            axios.post('http://localhost:5000/add/', task)
+            axios.post('http://localhost:5000/add/', task, { headers: {'x-auth-token': token} })
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorAddPost: ' + err));
         } else {
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline));
-            axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task)
+            axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task, { headers: {'x-auth-token': token} })
             .then(res => console.log(res.data))
             .catch(err => console.log('ErrorUpdatePost: ' + err));
         }
