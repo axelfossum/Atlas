@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import UserContext from '../context/UserContext';
+import '../styles/custom.css';
+import accountImg from '../styles/img/user.svg';
 
 export default function AuthOptions(){
     const { userData, setUserData } = useContext(UserContext);
@@ -15,13 +17,19 @@ export default function AuthOptions(){
             user: undefined
         });
         localStorage.setItem('auth-token', ''); 
-        window.location = '/';
+        history.push('/');
     };
+    const account = () => { history.push('/account'); }
 
     return (
         <div>
             {userData.user ? (
-                <button type="button" onClick={logout} className="btn px-4 btn-purple">Sign out</button> 
+                <>
+                <button type="button" onClick={account} className="btn btn-outline-secondary account-btn">
+                    <img src={accountImg} width="20" height="20" alt="" className="mx-2 account-icon"></img>
+                </button>
+                <button type="button" onClick={logout} className="btn px-4 btn-purple ml-3">Sign out</button> 
+                </>
                 ) : (
                     <>
                     <button type="button" onClick={login} className="btn px-4 btn-purple">Sign in</button>
