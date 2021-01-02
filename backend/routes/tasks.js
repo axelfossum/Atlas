@@ -1,27 +1,41 @@
 const router = require('express').Router();
 let TasksModel = require('../models/tasks.model');
 const timezoneOffset = new Date().getTimezoneOffset()*60*1000;
+const auth = require('../middleware/auth');
 
-router.route('/').get((req,res) => {
-    TasksModel.find()
+router.get('/', auth, async (req,res) => {
+    try{
+        await TasksModel.find({user: req.user})
         .then(tasks => res.json(tasks))
         .catch(err => res.status(404).json('ErrorTasksGet: ' + err));
+    }
+    catch(err){
+        // Something did not work out
+        res.status(500).json({ error: err.message });
+    }
 });
 
-router.route('/add').post((req,res) => {
-    const title = req.body.title;
-    const course = req.body.course;
-    const description = req.body.description;
-    const deadline = req.body.deadline;
-    const finished = false;
+router.post('/add', auth, async (req,res) => {
+    try{
+    
+        const newTask = await new TasksModel({
+            title: req.body.title, 
+            course: req.body.course, 
+            description: req.body.description, 
+            deadline: req.body.deadline,
+            user: req.user, 
+            finished: req.body.finished
+        });
 
-    const newTask = new TasksModel({
-        title, course, description, deadline, finished
-    });
-
-    newTask.save()
-        .then(() => res.json('Task added!'))
-        .catch(err => res.status(400).json('ErrorAddSave: ' + err));
+        await newTask.save()
+            .then(() => res.json('Task added!'))
+            .catch(err => res.status(400).json('ErrorAddSave: ' + err));
+            
+    }
+    catch(err){
+        // Something did not work out
+        res.status(500).json({ error: err.message });
+    }
 });
 
 router.route('/:id').delete((req,res) => {
