@@ -18,7 +18,7 @@ body::before {
     height: 100%;  
     opacity: .3; 
     z-index: -1;
-    background: url("./img/criss-cross.png");
+    background-image: url("./img/criss-cross.png");
 }
 
 .btn-divider {
@@ -67,6 +67,10 @@ textarea {
     margin-bottom: 70px;
 }
 
+.mt-15 {
+    margin-top: 100px;
+}
+
 h1, h2, h3 {
     font-family: 'Roboto Slab', serif;
 }
@@ -83,4 +87,36 @@ h1, h2, h3 {
 
 .account-btn:hover {
     background-color: rgba(0,0,0,0.1);
+}
+
+.course-item {
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: white;
+}
+
+.course-item h6 {
+    font-size: 15px;
+}
+
+.course-item a {
+    font-size: 13px;
+}
+
+.add-course-field {
+    border: 1px solid #ccc;
+    border-bottom: 3px solid #ccc;
+    margin-bottom: 10px;
+    height: 35px;
+}
+
+.add-course-field:focus {
+    outline: none;
+}
+
+.course-item button {
+    font-size: 13px;
+    padding: 0;
+    margin: 0;
 }
