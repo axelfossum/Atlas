@@ -144,8 +144,71 @@ router.get('/getuser', auth, async (req, res) => {
         res.json({
             firstname: user.firstname,
             lastname: user.lastname,
-            id: user._id
+            id: user._id,
+            courses: user.courses
         });
+    }
+    catch(err){
+        // Something did not work out
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.post('/add-course', auth, async (req, res) => {
+    try{
+        if(req.body.newCourse){
+            const user = await Users.findByIdAndUpdate(
+                { _id: req.user },
+                { $addToSet: {courses: req.body.newCourse} },
+                { upsert: true }
+            );
+        }
+    }
+    catch(err){
+        // Something did not work out
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.delete('/remove-course/:course', auth, async (req, res) => {
+    try{
+        if(req.params.course){
+            const user = await Users.findByIdAndUpdate(
+                { _id: req.user },
+                { $pull: {courses: req.params.course} }
+            );
+        }
+    }
+    catch(err){
+        // Something did not work out
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+router.post('/update-course', auth, async (req, res) => {
+    try{
+        if(req.body.editCourseText){
+            // Check if a course with the new name already exists
+            const courseExists = await Users.findOne(
+                { _id: req.user, courses: req.body.editCourseText }
+            );
+
+            // Remove selected course and add a new course with the new desired title
+            if(!courseExists){
+                // Add
+                await Users.findOneAndUpdate(
+                    { _id: req.user, courses: req.body.originalCourse },
+                    { $set: {"courses.$": req.body.editCourseText} }
+                );
+
+                return res.json('Edited course!');
+            } else {
+                return res.status(400).json({ msg: 'A course with this name already exists.' });
+            }
+        }
     }
     catch(err){
         // Something did not work out

@@ -6,13 +6,7 @@ const usersSchema = new Schema({
     lastname: {type: String, required: true},
     email: {type: String, required: true, unique: true},
     password: {type: String, required: false, minlength: 6},
-    // tasks: [{
-    //     title: {type: String, required: true},
-    //     course: {type: String, required: false},
-    //     description: {type: String, required: false},
-    //     deadline: {type: Date, required: true},
-    //     finished: {type: Boolean, required: true}
-    // }]
+    courses: [String]
 }, {
     timestamps: true
 });
