@@ -63,7 +63,8 @@ export default class ArchivedTasksList extends Component {
     }
 
     componentDidMount(){
-        axios.get('http://localhost:5000/')
+        const token = localStorage.getItem('auth-token');
+        axios.get('http://localhost:5000/', { headers: {'x-auth-token': token} })
             .then(response => {
                 this.setState({
                     tasks: response.data.filter(el => el.finished === true),
