@@ -5,6 +5,7 @@ import '../styles/custom.css';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from 'react-router-dom'
+import { relativeTimeThreshold } from 'moment';
 
 const Task = props => {
     return (
@@ -60,6 +61,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
         this.toggleFinish = this.toggleFinish.bind(this);
+        this.sortByDueTime = this.sortByDueTime.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
 
     }
@@ -93,6 +95,20 @@ export default class ActiveTasksList extends Component {
         });
     }
 
+    sortByDueTime(){
+        const token = localStorage.getItem('auth-token');
+        axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
+        .then(res =>{
+            this.setState({
+                tasks: res.data
+            })
+        })
+        .catch(err => {
+            console.log("hej");
+            console.log(err);
+        });
+    }
+
 
     confirmDelete(e){
         e.preventDefault();
@@ -102,6 +118,7 @@ export default class ActiveTasksList extends Component {
             console.log(res.data);
         })
         .catch(err => console.log(err)); 
+        
 
         this.setState({
             showConfirmDelete: !this.state.showConfirmDelete,
@@ -254,6 +271,7 @@ export default class ActiveTasksList extends Component {
             <div className="container-fluid px-5 pt-4 main-atlas">
                 <div className="row my-3">
                     <button className="btn btn-purple btn-lg shadow" onClick={() => this.toggleModal('')}>+ &nbsp;Add new task</button>
+                    <button className="btn btn-gray btn-lg shadow" onClick={() => this.sortByDueTime()}>Sort by duetime</button>
                 </div>
                 <div className="row">
                     {tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 

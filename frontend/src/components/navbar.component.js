@@ -15,7 +15,8 @@ export default class Navbar extends Component {
     }
 
     componentDidMount(){
-        axios.get('http://localhost:5000/')
+        const token = localStorage.getItem('auth-token');
+        axios.get('http://localhost:5000/', { headers: {'x-auth-token': token} })
             .then(response => {
                 this.setState({
                     nbrArchived: response.data.filter(el => el.finished === true).length
