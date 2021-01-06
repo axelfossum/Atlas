@@ -17,7 +17,7 @@ router.get('/', auth, async (req,res) => {
 
 router.get('/sortByDate', auth, async (req,res) => {
     try{
-        await TasksModel.find({user:req.user}).sort({'deadline': -1})
+        await TasksModel.find({user:req.user}).sort({'deadline': 1})
         .then(tasks => res.json(tasks))
         .catch(err => res.status(404).json('ErrorTasksGet: ' + err));
     }
@@ -60,24 +60,6 @@ router.route('/:id').get((req,res) => {
         .then(task => res.json(task))
         .catch(err => res.status(400).json(err));
 });
-/*
-router.route('/sortByDate').get(auth, async(req, res) => {
-    try{
-        await TasksModel.find({user: req.user})
-        .then(tasks => res.json(tasks))
-        .catch(err => res.status(404).json('ErrorTasksGet: ' + err));
-    }
-    try{
-         await TasksModel.find({}).sort({'title': -1})
-         .then(tasks => res.json(tasks))
-         .catch(err => res.status(404).json('ErrorTasksGet: ' + err));
-    } catch(e) {
-        console.log("då");
-      console.log('error:-', e)
-    }
-});
-*/
-
 
 router.route('/update/:id').post((req,res) => {
     TasksModel.findById(req.params.id)
