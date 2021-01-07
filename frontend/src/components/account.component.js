@@ -39,7 +39,7 @@ export default function Account(){
                 setUserData(userRes.data);
             }
 
-            console.log(userData);
+
         }
 
         fetchData();
