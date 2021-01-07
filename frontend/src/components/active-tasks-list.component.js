@@ -100,7 +100,7 @@ export default class ActiveTasksList extends Component {
         axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
         .then(res =>{
             this.setState({
-                tasks: res.data
+                tasks: res.data.filter(el => el.finished === false)
             })
         })
         .catch(err => {
