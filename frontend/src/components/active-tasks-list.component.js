@@ -43,6 +43,7 @@ export default class ActiveTasksList extends Component {
             showConfirmDelete: false,
             isLoaded: false,
             tasks: [],
+            userCourses: [],
             currentTask_id: '',
             currentTaskTitle: '',
             currentTaskCourse: '',
@@ -86,6 +87,13 @@ export default class ActiveTasksList extends Component {
                 console.log(err);
             });
 
+        axios.get('http://localhost:5000/user/getuser/', { headers: {'x-auth-token': token} })
+            .then(response => {
+                this.setState({ userCourses: response.data.courses });
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     toggleDelete(id){
@@ -171,7 +179,7 @@ export default class ActiveTasksList extends Component {
         this.setState({
             currentTask_id: '',
             currentTaskTitle: '',
-            currentTaskCourse: '',
+            currentTaskCourse: this.state.userCourses[0],
             currentTaskDescription: '',
             currentTaskDeadline: new Date()
         })     
@@ -296,12 +304,9 @@ export default class ActiveTasksList extends Component {
                                 <div className="row mb-3">
                                     <div className="col form-group">
                                         <label>Course: </label>
-                                        <input type="text"
-                                            required
-                                            className="form-control"
-                                            value={this.state.currentTaskCourse}
-                                            onChange={this.onChangeCurrentTaskCourse}
-                                        />
+                                        <select className="form-control" value={this.state.currentTaskCourse} onChange={this.onChangeCurrentTaskCourse}>
+                                            {this.state.userCourses.map(course => <option key={course} className="form-control">{course}</option>)}
+                                        </select>
                                     </div>
                                     <div className="col form-group">
                                         <label>Deadline: </label><br/>
