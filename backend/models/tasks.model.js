@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const tasksSchema = new Schema({
     title: {type: String, required: true},
-    course: {type: String, required: false},
+    course: {type: String, required: true},
     description: {type: String, required: false},
     deadline: {type: Date, required: true},
     user: {type: String, required: true},
