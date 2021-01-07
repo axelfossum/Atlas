@@ -76,7 +76,7 @@ export default class ActiveTasksList extends Component {
             });
         }
 
-        axios.get('http://localhost:5000/', { headers: {'x-auth-token': token} })
+        axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
             .then(response => {
                 this.setState({
                     isLoaded: true,
@@ -108,7 +108,7 @@ export default class ActiveTasksList extends Component {
         axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
         .then(res =>{
             this.setState({
-                tasks: res.data
+                tasks: res.data.filter(el => el.finished === false)
             })
         })
         .catch(err => {
