@@ -52,7 +52,8 @@ export default class ActiveTasksList extends Component {
             currentTaskDeadline: new Date(),
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
-            isLoggedIn: false
+            isLoggedIn: false,
+            newCourse: ''
         };
 
         this.toggleDelete = this.toggleDelete.bind(this);
@@ -61,6 +62,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskCourse = this.onChangeCurrentTaskCourse.bind(this);
         this.onChangeCurrentTaskDeadline = this.onChangeCurrentTaskDeadline.bind(this);
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
+        this.onChangeNewCourse = this.onChangeNewCourse.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
         this.toggleFinish = this.toggleFinish.bind(this);
         this.sortBy = this.sortBy.bind(this);
@@ -179,7 +181,8 @@ export default class ActiveTasksList extends Component {
             currentTaskTitle: '',
             currentTaskCourse: this.state.userCourses[0],
             currentTaskDescription: '',
-            currentTaskDeadline: new Date()
+            currentTaskDeadline: new Date(),
+            newCourse: ''
         })     
     }
 
@@ -207,13 +210,19 @@ export default class ActiveTasksList extends Component {
         });
     }
 
+    onChangeNewCourse(e){
+        this.setState({
+            newCourse: e.target.value
+        });
+    }
+
     onEditTask(e){
         e.preventDefault();
 
         const task = {
             title: this.state.currentTaskTitle,
             description: this.state.currentTaskDescription,
-            course: this.state.currentTaskCourse,
+            course: (this.state.newCourse !== '') ? this.state.newCourse : this.state.currentTaskCourse,
             finished: false
         }
 
@@ -251,6 +260,12 @@ export default class ActiveTasksList extends Component {
                 this.setState({ tasks: prevTasks });
             })
             .catch(err => console.log('ErrorUpdatePost: ' + err));
+        }
+
+        // If user has wished to add a new course, then we must add it to the database
+        if(this.state.newCourse !== ''){
+            const newCourse = {newCourse: this.state.newCourse};
+            axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} });
         }
 
         this.setState({ 
@@ -325,14 +340,14 @@ export default class ActiveTasksList extends Component {
                                         />
                                     </div>
                                 </div>
-                                <div className="row mb-3">
-                                    <div className="col form-group">
+                                <div className="row mb-0">
+                                    <div className="col-6 form-group">
                                         <label>Course: </label>
                                         <select className="form-control" value={this.state.currentTaskCourse} onChange={this.onChangeCurrentTaskCourse}>
                                             {this.state.userCourses.map(course => <option key={course} className="form-control">{course}</option>)}
                                         </select>
                                     </div>
-                                    <div className="col form-group">
+                                    <div className="col-6 form-group">
                                         <label>Deadline: </label><br/>
                                         <DatePicker
                                             className="form-control"
@@ -343,6 +358,17 @@ export default class ActiveTasksList extends Component {
                                             onChange={this.onChangeCurrentTaskDeadline}
                                         />
                                     </div>
+                                </div>
+                                <div className="row mb-3">
+                                    <div className="col-6 form-group">
+                                        <input type="text"
+                                            className="form-control"
+                                            value={this.state.newCourse}
+                                            onChange={this.onChangeNewCourse}
+                                            placeholder="Or add a new course:"
+                                        />
+                                    </div>
+                                    <div className="col-6"></div>
                                 </div>
                                 <div className="form-group">
                                     <label>Description: </label>

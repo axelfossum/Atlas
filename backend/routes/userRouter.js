@@ -157,6 +157,7 @@ router.get('/getuser', auth, async (req, res) => {
 
 router.post('/add-course', auth, async (req, res) => {
     try{
+        console.log(req.body.newCourse);
         if(req.body.newCourse){
             const user = await Users.findByIdAndUpdate(
                 { _id: req.user },
