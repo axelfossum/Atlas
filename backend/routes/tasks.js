@@ -39,7 +39,9 @@ router.post('/add', auth, async (req,res) => {
         });
 
         await newTask.save()
-            .then(() => res.json('Task added!'))
+            .then(() => {
+                res.json(newTask);
+            })
             .catch(err => res.status(400).json('ErrorAddSave: ' + err));
             
     }
@@ -74,7 +76,7 @@ router.route('/update/:id').post((req,res) => {
                 task.deadline = new Date(Date.parse(req.body.deadline) - timezoneOffset);
             }
             task.save()
-                .then(() => res.json('Task updated!'))
+                .then(() => res.json(task)) // return the updated task
                 .catch(err => res.status(400).json(err));
         })
         .catch(err => res.status(400).json(err));

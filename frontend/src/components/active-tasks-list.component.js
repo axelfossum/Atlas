@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { relativeTimeThreshold } from 'moment';
 
 const Task = props => {
+
     return (
             <div className="card mr-4 my-3 col-md-3 shadow">
                 <div className="card-body">
@@ -130,10 +131,8 @@ export default class ActiveTasksList extends Component {
 
         this.setState({
             showConfirmDelete: !this.state.showConfirmDelete,
-            tasks: this.state.tasks.filter(el => el._id !== this.state.currentTask_id)
+            tasks: this.state.tasks.filter(el => el._id !== this.state.currentTask_id),
         });
-
-        window.location= '/';
     }
 
     toggleFinish(id){
@@ -222,18 +221,43 @@ export default class ActiveTasksList extends Component {
         const token = localStorage.getItem('auth-token');
 
         if(this.state.addingNewTask){
+
+            // We will want to update the tasks state, so we store the previous version here, which we will modify below
+            let prevTasks = this.state.tasks;
+
+            // Important to get the right date (because of time zone conversions etc..)
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) - this.state.timezoneOffset);
+
+            // POST the new task and recieve the db-saved new task with its new id from backend.
             axios.post('http://localhost:5000/add/', task, { headers: {'x-auth-token': token} })
-            .then(res => console.log(res.data))
+            .then(res => {
+                prevTasks.push(res.data);
+                this.setState({ tasks: prevTasks });
+            })
             .catch(err => console.log('ErrorAddPost: ' + err));
+
         } else {
+
+            // We will want to update the tasks state, so we store the previous version here, which we will modify below
+            let prevTasks = this.state.tasks;
+
+            // Important to get the right date (because of time zone conversions etc..) NOT the same as the similar line above
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline));
+
+            // POST the updated task and recieve the db-updated task which we use to update our react states to trigger re-render
             axios.post('http://localhost:5000/update/'+this.state.currentTask_id, task, { headers: {'x-auth-token': token} })
-            .then(res => console.log(res.data))
+            .then(res => {
+                const oldTaskIndex = prevTasks.findIndex(element => element._id === this.state.currentTask_id);
+                prevTasks[oldTaskIndex] = res.data;
+                this.setState({ tasks: prevTasks });
+            })
             .catch(err => console.log('ErrorUpdatePost: ' + err));
         }
 
-        window.location= '/';
+        this.setState({ 
+            showModal: !this.state.showModal 
+        });
+
     }
 
     render(){
@@ -282,7 +306,7 @@ export default class ActiveTasksList extends Component {
                     <button className="btn btn-gray btn-lg shadow" onClick={() => this.sortByDueTime()}>Sort by duetime</button>
                 </div>
                 <div className="row">
-                    {tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 
+                    {this.state.tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 
                     toggleDelete={this.toggleDelete} showModal={this.toggleModal} toggleFinish={this.toggleFinish}/>) }
                 </div>
 
