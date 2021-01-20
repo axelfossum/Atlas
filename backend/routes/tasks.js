@@ -26,6 +26,17 @@ router.get('/sortByDate', auth, async (req,res) => {
     }
 });
 
+router.get('/sortByCourse', auth, async (req,res) => {
+    try{
+        await TasksModel.find({user:req.user}).sort({'course': 1})
+        .then(tasks => res.json(tasks))
+        .catch(err => res.status(404).json('ErrorTasksGet: ' + err));
+    }
+    catch(err){
+        res.status(500).json({ error: err.message });
+    }
+});
+
 router.post('/add', auth, async (req,res) => {
     try{
     

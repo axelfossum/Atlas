@@ -63,7 +63,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
         this.toggleFinish = this.toggleFinish.bind(this);
-        this.sortByDueTime = this.sortByDueTime.bind(this);
+        this.sortBy = this.sortBy.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
 
     }
@@ -104,16 +104,15 @@ export default class ActiveTasksList extends Component {
         });
     }
 
-    sortByDueTime(){
+    sortBy(e){
         const token = localStorage.getItem('auth-token');
-        axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
+        axios.get('http://localhost:5000/'+ e, { headers: {'x-auth-token': token} })
         .then(res =>{
             this.setState({
                 tasks: res.data.filter(el => el.finished === false)
             })
         })
         .catch(err => {
-            console.log("hej");
             console.log(err);
         });
     }
@@ -303,7 +302,8 @@ export default class ActiveTasksList extends Component {
             <div className="container-fluid px-5 pt-4 main-atlas">
                 <div className="row my-3">
                     <button className="btn btn-purple btn-lg shadow" onClick={() => this.toggleModal('')}>+ &nbsp;Add new task</button>
-                    <button className="btn btn-gray btn-lg shadow" onClick={() => this.sortByDueTime()}>Sort by duetime</button>
+                    <button className="btn btn-gray btn-lg shadow" onClick={() => this.sortBy('sortByDate')}>Sort by duetime</button>
+                    <button className="btn btn-gray btn-lg shadow" onClick={() => this.sortBy('sortByCourse')}>Sort by course</button>
                 </div>
                 <div className="row">
                     {this.state.tasks.map(currentTask => <Task key={currentTask._id} task={currentTask} 
