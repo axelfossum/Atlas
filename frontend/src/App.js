@@ -8,6 +8,7 @@ import About from "./components/about.component";
 import Login from "./components/login.component";
 import Register from "./components/register.component";
 import Account from "./components/account.component";
+import Footer from "./components/footer.component";
 import UserContext from './context/UserContext';
 import axios from 'axios';
 
@@ -55,6 +56,7 @@ function App() {
         <Route path="/register" component={Register} />
         <Route path="/archived" component={ArchivedTasksList} />
         <Route path="/account" component={Account} />
+        <Footer />
       </UserContext.Provider>
     </Router>
   );
