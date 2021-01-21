@@ -47,7 +47,7 @@ export default class ArchivedTasksList extends Component {
             finished: !this.state.tasks.find(task => task._id === id).finished
         }
 
-        axios.post('http://localhost:5000/update/'+ id, task)
+        axios.post('http://localhost:5000/update/'+ id + '/finished/', task)
         .then(res => {
             console.log(res.data);
         })
@@ -81,6 +81,23 @@ export default class ArchivedTasksList extends Component {
                 </div>
             );
         }
+      else if(tasks.length===0){
+            return (
+                <div className="container-fluid px-5 pt-5 text-center">
+                <div className="row">
+                    <div className="col-3"></div>
+                    <div className="col-6">
+                        <h2>Your archive is empty</h2>
+                        <p className="mb-5">
+                             Your tasks will be displayed here in the archive once you mark them as finished.  
+                        </p>
+                    </div>
+                    <div className="col-3"></div>
+                </div>
+                
+            </div>
+            );
+        } 
         return (
             <div className="container-fluid px-5 pt-4 main-atlas">
                 <div className="card shadow">
@@ -101,7 +118,7 @@ export default class ArchivedTasksList extends Component {
                         </table>
                     </div>
                 </div>
-            </div>
+            </div>                   
         );
     }
 
