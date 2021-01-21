@@ -9,7 +9,7 @@ export default class Footer extends Component {
     
     render() {
         return (
-            <footer class="bg-light text-center text-lg-start custom-footer">
+            <footer className="bg-light text-center text-lg-start custom-footer">
                 
                 
             <div className="text-center p-3">
