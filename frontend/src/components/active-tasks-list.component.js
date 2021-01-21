@@ -5,7 +5,7 @@ import '../styles/custom.css';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from 'react-router-dom'
-import { relativeTimeThreshold } from 'moment';
+import ErrorNotice from "./error-notice.component";
 
 const Task = props => {
 
@@ -53,7 +53,8 @@ export default class ActiveTasksList extends Component {
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
             isLoggedIn: false,
-            newCourse: ''
+            newCourse: '',
+            error: undefined
         };
 
         this.toggleDelete = this.toggleDelete.bind(this);
@@ -233,6 +234,9 @@ export default class ActiveTasksList extends Component {
             // We will want to update the tasks state, so we store the previous version here, which we will modify below
             let prevTasks = this.state.tasks;
 
+            // If no course has been selected from the dropdown (if no course has been added) and no new course typed in
+            if(task.course === undefined) task.course = 'No course';
+
             // Important to get the right date (because of time zone conversions etc..)
             task.deadline = new Date(Date.parse(this.state.currentTaskDeadline) - this.state.timezoneOffset);
 
@@ -240,9 +244,9 @@ export default class ActiveTasksList extends Component {
             axios.post('http://localhost:5000/add/', task, { headers: {'x-auth-token': token} })
             .then(res => {
                 prevTasks.push(res.data);
-                this.setState({ tasks: prevTasks });
+                this.setState({ tasks: prevTasks, showModal: !this.state.showModal, error: undefined });
             })
-            .catch(err => console.log('ErrorAddPost: ' + err));
+            .catch(err => err.response.data.msg && this.setState( {error: err.response.data.msg} ));
 
         } else {
 
@@ -257,20 +261,16 @@ export default class ActiveTasksList extends Component {
             .then(res => {
                 const oldTaskIndex = prevTasks.findIndex(element => element._id === this.state.currentTask_id);
                 prevTasks[oldTaskIndex] = res.data;
-                this.setState({ tasks: prevTasks });
+                this.setState({ tasks: prevTasks, showModal: !this.state.showModal, error: undefined });
             })
-            .catch(err => console.log('ErrorUpdatePost: ' + err));
+            .catch(err => err.response.data.msg && this.setState( {error: err.response.data.msg} ));
         }
 
         // If user has wished to add a new course, then we must add it to the database
-        if(this.state.newCourse !== ''){
+        if(this.state.newCourse !== '' && this.state.error !== undefined){
             const newCourse = {newCourse: this.state.newCourse};
             axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} });
         }
-
-        this.setState({ 
-            showModal: !this.state.showModal 
-        });
 
     }
 
@@ -329,11 +329,13 @@ export default class ActiveTasksList extends Component {
                     <form onSubmit={this.onEditTask}>
                         <Modal.Body>
                             <div className="p-2">
+                                {this.state.error !== undefined && (
+                                    <ErrorNotice message={this.state.error} clearError={() => this.setState( {error: undefined} )} />
+                                )}
                                 <div className="row mt-2 mb-3">
                                     <div className="col form-group">
                                         <label>Title: </label>
                                         <input type="text"
-                                            required
                                             className="form-control"
                                             value={this.state.currentTaskTitle}
                                             onChange={this.onChangeCurrentTaskTitle}

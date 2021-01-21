@@ -38,6 +38,11 @@ router.get('/sortByCourse', auth, async (req,res) => {
 });
 
 router.post('/add', auth, async (req,res) => {
+    // Check that title has been entered, all other fields will be filled in automatically or they are not not required
+    if(!req.body.title) {
+        return res.status(500).json({msg: 'Please enter a title for this task.'});
+    }
+
     try{
     
         const newTask = await new TasksModel({
@@ -75,6 +80,12 @@ router.route('/:id').get((req,res) => {
 });
 
 router.route('/update/:id').post((req,res) => {
+    // Check that title has been entered, all other fields will be filled in automatically or they are not not required
+    if(!req.body.title) {
+        console.log('Should throw error');
+        return res.status(500).json({msg: 'Please enter a title for this task.'});
+    }
+
     TasksModel.findById(req.params.id)
         .then(task => {
             if(req.body.finished !== task.finished){
