@@ -53,6 +53,7 @@ export default class ActiveTasksList extends Component {
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
             isLoggedIn: false,
+            showAddNewCourse: false,
             newCourse: '',
             error: undefined
         };
@@ -68,6 +69,7 @@ export default class ActiveTasksList extends Component {
         this.toggleFinish = this.toggleFinish.bind(this);
         this.sortBy = this.sortBy.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
+        this.onAddNewCourse = this.onAddNewCourse.bind(this);
 
     }
     
@@ -171,6 +173,7 @@ export default class ActiveTasksList extends Component {
         }
 
         this.setState({
+            addNewCourse: false,
             showModal: !this.state.showModal,
         });
         
@@ -215,6 +218,23 @@ export default class ActiveTasksList extends Component {
         this.setState({
             newCourse: e.target.value
         });
+    }
+
+    onAddNewCourse(e){
+        e.preventDefault();
+
+        const token = localStorage.getItem('auth-token');
+
+        // If user has wished to add a new course, then we must add it to the database
+        if(this.state.newCourse !== ''){
+            const newCourse = {newCourse: this.state.newCourse};    // Must do it like this for backend to work
+            axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} })
+        }
+
+        const prevCourses = this.state.userCourses;
+        prevCourses.push(this.state.newCourse);
+        this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
+
     }
 
     onEditTask(e){
@@ -264,12 +284,6 @@ export default class ActiveTasksList extends Component {
                 this.setState({ tasks: prevTasks, showModal: !this.state.showModal, error: undefined });
             })
             .catch(err => err.response.data.msg && this.setState( {error: err.response.data.msg} ));
-        }
-
-        // If user has wished to add a new course, then we must add it to the database
-        if(this.state.newCourse !== '' && this.state.error !== undefined){
-            const newCourse = {newCourse: this.state.newCourse};
-            axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} });
         }
 
     }
@@ -342,13 +356,19 @@ export default class ActiveTasksList extends Component {
                                         />
                                     </div>
                                 </div>
-                                <div className="row mb-0">
-                                    <div className="col-6 form-group">
+                                <div className="row mb-3">
+                                    <div className="col form-group">
                                         <label>Course: </label>
-                                        <select className="form-control" value={this.state.currentTaskCourse} onChange={this.onChangeCurrentTaskCourse}>
-                                            {this.state.userCourses.map(course => <option key={course} className="form-control">{course}</option>)}
-                                        </select>
+                                        <div className="input-group">
+                                            <select className="form-control" value={this.state.currentTaskCourse} onChange={this.onChangeCurrentTaskCourse}>
+                                                {this.state.userCourses.map(course => <option key={course} className="form-control">{course}</option>)}
+                                            </select>
+                                            <label>&nbsp;</label>
+                                            <button type="button" className="ml-3 btn btn-outline-success" onClick={() => this.setState({ showAddNewCourse: true })}>+ Add new course</button>
+                                        </div>
                                     </div>
+                                </div>
+                                <div className="row mb-3">
                                     <div className="col-6 form-group">
                                         <label>Deadline: </label><br/>
                                         <DatePicker
@@ -358,16 +378,6 @@ export default class ActiveTasksList extends Component {
                                             timeFormat="HH:mm"
                                             dateFormat="dd/MM/yyyy HH:mm"
                                             onChange={this.onChangeCurrentTaskDeadline}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="row mb-3">
-                                    <div className="col-6 form-group">
-                                        <input type="text"
-                                            className="form-control"
-                                            value={this.state.newCourse}
-                                            onChange={this.onChangeNewCourse}
-                                            placeholder="Or add a new course:"
                                         />
                                     </div>
                                     <div className="col-6"></div>
@@ -388,6 +398,7 @@ export default class ActiveTasksList extends Component {
                         </Modal.Footer>
                     </form>
                 </Modal>
+
                 <Modal show={this.state.showConfirmDelete} onHide={() => this.toggleDelete('')}>
                     <form onSubmit={this.confirmDelete}>
                         <Modal.Body>
@@ -397,6 +408,25 @@ export default class ActiveTasksList extends Component {
                                 <br/>
                                 <button type="button" className="btn btn-secondary mr-2" onClick={() => this.toggleDelete(this.state.currentTask_id)}>Cancel</button>
                                 <button className="btn btn-danger ml-2">Confirm</button>
+                            </div>
+                        </Modal.Body>
+                    </form>
+                </Modal>
+
+                <Modal show={this.state.showAddNewCourse} onHide={() => this.setState({showAddNewCourse: !this.state.showAddNewCourse})} className="newCourseModal">
+                    <form onSubmit={this.onAddNewCourse}>
+                        <Modal.Body>
+                            <label>Enter a new course: </label>
+                            <input type="text"
+                                className="form-control"
+                                value={this.state.newCourse}
+                                onChange={this.onChangeNewCourse}
+                            />
+                            <div className="mt-3">
+                                <button className="btn btn-success mr-2">Add new course</button>
+                                <button type="button" className="btn btn-outline-secondary" onClick={() => this.setState({showAddNewCourse: !this.state.showAddNewCourse})}>
+                                    Cancel
+                                </button>
                             </div>
                         </Modal.Body>
                     </form>
