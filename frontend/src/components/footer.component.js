@@ -13,7 +13,7 @@ export default class Footer extends Component {
                 
                 
             <div className="text-center p-3">
-            © 2020 Copyright Atlas
+            © 2021 Copyright Atlas
              </div>
   
              
