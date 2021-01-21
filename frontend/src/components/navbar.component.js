@@ -10,7 +10,7 @@ export default class Navbar extends Component {
         super(props);
 
         this.state = {
-            nbrArchived: 0
+            nbrArchived: ""
         }
     }
 

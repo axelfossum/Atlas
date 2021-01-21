@@ -47,7 +47,7 @@ export default class ArchivedTasksList extends Component {
             finished: !this.state.tasks.find(task => task._id === id).finished
         }
 
-        axios.post('http://localhost:5000/update/'+ id, task)
+        axios.post('http://localhost:5000/update/'+ id + '/finished/', task)
         .then(res => {
             console.log(res.data);
         })
