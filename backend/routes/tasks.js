@@ -38,6 +38,11 @@ router.get('/sortByCourse', auth, async (req,res) => {
 });
 
 router.post('/add', auth, async (req,res) => {
+    // Check that title has been entered, all other fields will be filled in automatically or they are not not required
+    if(!req.body.title) {
+        return res.status(500).json({msg: 'Please enter a title for this task.'});
+    }
+
     try{
     
         const newTask = await new TasksModel({
@@ -50,7 +55,9 @@ router.post('/add', auth, async (req,res) => {
         });
 
         await newTask.save()
-            .then(() => res.json('Task added!'))
+            .then(() => {
+                res.json(newTask);
+            })
             .catch(err => res.status(400).json('ErrorAddSave: ' + err));
             
     }
@@ -73,6 +80,12 @@ router.route('/:id').get((req,res) => {
 });
 
 router.route('/update/:id').post((req,res) => {
+    // Check that title has been entered, all other fields will be filled in automatically or they are not not required
+    if(!req.body.title) {
+        console.log('Should throw error');
+        return res.status(500).json({msg: 'Please enter a title for this task.'});
+    }
+
     TasksModel.findById(req.params.id)
         .then(task => {
             if(req.body.finished !== task.finished){
@@ -85,7 +98,7 @@ router.route('/update/:id').post((req,res) => {
                 task.deadline = new Date(Date.parse(req.body.deadline) - timezoneOffset);
             }
             task.save()
-                .then(() => res.json('Task updated!'))
+                .then(() => res.json(task)) // return the updated task
                 .catch(err => res.status(400).json(err));
         })
         .catch(err => res.status(400).json(err));
