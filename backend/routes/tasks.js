@@ -79,9 +79,9 @@ router.route('/:id').get((req,res) => {
         .catch(err => res.status(400).json(err));
 });
 
-router.route('/update/:id').post((req,res) => {
+router.route('/update/:id/:finished?').post((req,res) => {
     // Check that title has been entered, all other fields will be filled in automatically or they are not not required
-    if(!req.body.title) {
+    if(!req.params.finished && !req.body.title) {
         return res.status(500).json({msg: 'Please enter a title for this task.'});
     }
 
