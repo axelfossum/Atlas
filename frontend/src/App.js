@@ -56,7 +56,10 @@ function App() {
         <Route path="/register" component={Register} />
         <Route path="/archived" component={ArchivedTasksList} />
         <Route path="/account" component={Account} />
-        <Footer />
+        {/*
+       <Footer />
+       */
+        }
       </UserContext.Provider>
     </Router>
   );
