@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from 'react-router-dom'
 import ErrorNotice from "./error-notice.component";
+import { TwitterPicker } from 'react-color';
 
 const Task = props => {
 
@@ -54,8 +55,11 @@ export default class ActiveTasksList extends Component {
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
             isLoggedIn: false,
             showAddNewCourse: false,
+            newCourseColor: '#922585',
             newCourse: '',
-            error: undefined
+            error: undefined,
+            newCourseError: undefined,
+            prevSelectedCourse: undefined
         };
 
         this.toggleDelete = this.toggleDelete.bind(this);
@@ -65,6 +69,7 @@ export default class ActiveTasksList extends Component {
         this.onChangeCurrentTaskDeadline = this.onChangeCurrentTaskDeadline.bind(this);
         this.onChangeCurrentTaskDescription = this.onChangeCurrentTaskDescription.bind(this);
         this.onChangeNewCourse = this.onChangeNewCourse.bind(this);
+        this.onChangeNewCourseColor = this.onChangeNewCourseColor.bind(this);
         this.onEditTask = this.onEditTask.bind(this);
         this.toggleFinish = this.toggleFinish.bind(this);
         this.sortBy = this.sortBy.bind(this);
@@ -95,7 +100,9 @@ export default class ActiveTasksList extends Component {
 
         axios.get('http://localhost:5000/user/getuser/', { headers: {'x-auth-token': token} })
             .then(response => {
-                this.setState({ userCourses: response.data.courses });
+                const fetchedCourses = response.data.courses;
+                fetchedCourses.map(course => course.active = false);
+                this.setState({ userCourses: fetchedCourses });
             })
             .catch(err => {
                 console.log(err);
@@ -128,7 +135,7 @@ export default class ActiveTasksList extends Component {
 
         axios.delete('http://localhost:5000/'+this.state.currentTask_id)
         .then(res => {
-            console.log(res.data);
+            // Nothing to do here.
         })
         .catch(err => console.log(err)); 
         
@@ -146,7 +153,7 @@ export default class ActiveTasksList extends Component {
 
         axios.post('http://localhost:5000/update/'+ id + '/finished/', task)
         .then(res => {
-            console.log(res.data);
+            // Nothing to do here.
         })
         .catch(err => console.log(err));
 
@@ -197,9 +204,18 @@ export default class ActiveTasksList extends Component {
     }
 
     onChangeCurrentTaskCourse(e){
+        const courseIndex = this.state.userCourses.findIndex(course => course.coursename === e.target.value);
+        const courses = this.state.userCourses;
+        if(!courses[courseIndex].active){
+            courses.map(course => course.active = false);
+            courses[courseIndex].active = !courses[courseIndex].active;
+        }
+        
         this.setState({
+            userCourses: courses,
             currentTaskCourse: e.target.value
         });
+
     }
 
     onChangeCurrentTaskDeadline(deadline){
@@ -220,20 +236,37 @@ export default class ActiveTasksList extends Component {
         });
     }
 
-    onAddNewCourse(e){
+    onChangeNewCourseColor(color){
+        this.setState({
+            newCourseColor: color.hex
+        });
+    }
+
+    onAddNewCourse = async (e) => {
         e.preventDefault();
 
         const token = localStorage.getItem('auth-token');
 
-        // If user has wished to add a new course, then we must add it to the database
-        if(this.state.newCourse !== ''){
-            const newCourse = {newCourse: this.state.newCourse};    // Must do it like this for backend to work
-            axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} })
-        }
+        // Clear the newCourseError if there were any previous errors who are now obsolete
+        if(this.state.newCourseError) this.setState({newCourseError: undefined});
+        
 
-        const prevCourses = this.state.userCourses;
-        prevCourses.push(this.state.newCourse);
-        this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
+        // Check if the course already exists, using toUpperCase to ignore case sensitivity.
+        await this.state.userCourses.map(course => {
+            if(course.coursename.toUpperCase() === this.state.newCourse.toUpperCase()){
+                this.setState({ newCourseError: 'You have already added this course.' });
+            }
+        });
+
+        // If user has wished to add a new course, then we must add it to the database
+        if(this.state.newCourse !== '' && !this.state.newCourseError){
+            const newCourse = {newCourse: this.state.newCourse, newCourseColor: this.state.newCourseColor};    // Must do it like this for backend to work
+            axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} })
+
+            const prevCourses = this.state.userCourses;
+            prevCourses.push({coursename: this.state.newCourse, coursecolor: this.state.newCourseColor, active: true});
+            this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
+        }
 
     }
 
@@ -359,12 +392,26 @@ export default class ActiveTasksList extends Component {
                                 <div className="row mb-3">
                                     <div className="col form-group">
                                         <label>Course: </label>
-                                        <div className="input-group">
-                                            <select className="form-control" value={this.state.currentTaskCourse} onChange={this.onChangeCurrentTaskCourse}>
-                                                {this.state.userCourses.map(course => <option key={course} className="form-control">{course}</option>)}
-                                            </select>
-                                            <label>&nbsp;</label>
-                                            <button type="button" className="ml-3 btn btn-outline-success" onClick={() => this.setState({ showAddNewCourse: true })}>+ Add new course</button>
+                                        <div className="row mb-1">
+                                            <div className="col">
+                                                {this.state.userCourses.map(course => 
+                                                    <button type="button"
+                                                        key={course.coursename} 
+                                                        className={course.active ? "courseTag mr-1 activeCourse" : "courseTag mr-1"} 
+                                                        style={{outline: 'none', backgroundColor: course.coursecolor}}
+                                                        value={course.coursename}
+                                                        onClick={this.onChangeCurrentTaskCourse}
+                                                    >
+                                                    {course.coursename}
+                                                    </button>)}
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col">
+                                                <button type="button" className="btn btn-link btn-sm" onClick={() => this.setState({ showAddNewCourse: true })}>
+                                                    + New course
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -413,21 +460,33 @@ export default class ActiveTasksList extends Component {
                     </form>
                 </Modal>
 
-                <Modal show={this.state.showAddNewCourse} onHide={() => this.setState({showAddNewCourse: !this.state.showAddNewCourse})} className="newCourseModal">
+                <Modal show={this.state.showAddNewCourse} onHide={() => this.setState({showAddNewCourse: !this.state.showAddNewCourse, newCourseError: undefined})} 
+                    className="newCourseModal">
                     <form onSubmit={this.onAddNewCourse}>
                         <Modal.Body>
+                            {this.state.newCourseError &&
+                                <ErrorNotice message={this.state.newCourseError} clearError={() => this.setState( {newCourseError: undefined} )} />
+                            }
                             <label>Enter a new course: </label>
                             <input type="text"
                                 className="form-control"
                                 value={this.state.newCourse}
                                 onChange={this.onChangeNewCourse}
                             />
-                            <div className="mt-3">
+                            <div className="mt-4">
+                                <label>Select a color for this course: </label>
+                                <TwitterPicker 
+                                    color={this.state.newCourseColor}
+                                    onChangeComplete={this.onChangeNewCourseColor}
+                                />
+                            </div>
+                            <div className="mt-4">
                                 <button className="btn btn-success mr-2">Add new course</button>
                                 <button type="button" className="btn btn-outline-secondary" onClick={() => this.setState({showAddNewCourse: !this.state.showAddNewCourse})}>
                                     Cancel
                                 </button>
                             </div>
+
                         </Modal.Body>
                     </form>
                 </Modal>

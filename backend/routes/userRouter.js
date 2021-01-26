@@ -157,11 +157,11 @@ router.get('/getuser', auth, async (req, res) => {
 
 router.post('/add-course', auth, async (req, res) => {
     try{
-        console.log(req.body.newCourse);
+        const courseToAdd = {coursename: req.body.newCourse, coursecolor: req.body.newCourseColor};
         if(req.body.newCourse){
             const user = await Users.findByIdAndUpdate(
                 { _id: req.user },
-                { $addToSet: {courses: req.body.newCourse} },
+                { $addToSet: {courses: courseToAdd} },
                 { upsert: true }
             );
         }
@@ -178,7 +178,7 @@ router.delete('/remove-course/:course', auth, async (req, res) => {
         if(req.params.course){
             const user = await Users.findByIdAndUpdate(
                 { _id: req.user },
-                { $pull: {courses: req.params.course} }
+                { $pull: {courses: {coursename: req.params.course}} }
             );
         }
     }
