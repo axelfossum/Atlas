@@ -75,6 +75,7 @@ export default class ActiveTasksList extends Component {
         this.sortBy = this.sortBy.bind(this);
         this.confirmDelete = this.confirmDelete.bind(this);
         this.onAddNewCourse = this.onAddNewCourse.bind(this);
+        this.onRemoveCourse = this.onRemoveCourse.bind(this);
 
     }
     
@@ -242,6 +243,14 @@ export default class ActiveTasksList extends Component {
         });
     }
 
+    onRemoveCourse(id){
+        const token = localStorage.getItem('auth-token');
+        axios.delete('http://localhost:5000/user/remove-course/'+ id, { headers: {'x-auth-token': token} });
+        this.setState({
+            userCourses: this.state.userCourses.filter(course => course._id !== id)
+        });
+    }
+
     onAddNewCourse = async (e) => {
         e.preventDefault();
 
@@ -259,13 +268,18 @@ export default class ActiveTasksList extends Component {
         });
 
         // If user has wished to add a new course, then we must add it to the database
-        if(this.state.newCourse !== '' && !this.state.newCourseError){
+        if(!this.state.newCourseError){
+            console.log('get here');
             const newCourse = {newCourse: this.state.newCourse, newCourseColor: this.state.newCourseColor};    // Must do it like this for backend to work
             axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} })
-
-            const prevCourses = this.state.userCourses;
-            prevCourses.push({coursename: this.state.newCourse, coursecolor: this.state.newCourseColor, active: true});
-            this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
+                .then(res => {
+                    const prevCourses = this.state.userCourses;
+                    const newAddedCourse = res.data;
+                    newAddedCourse.active = false;
+                    prevCourses.push(newAddedCourse);
+                    this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
+                })
+            console.log('get here 2');
         }
 
     }
@@ -394,16 +408,19 @@ export default class ActiveTasksList extends Component {
                                         <label>Course: </label>
                                         <div className="row mb-1">
                                             <div className="col">
-                                                {this.state.userCourses.map(course => 
-                                                    <button type="button"
-                                                        key={course.coursename} 
-                                                        className={course.active ? "courseTag mr-1 activeCourse" : "courseTag mr-1"} 
-                                                        style={{outline: 'none', backgroundColor: course.coursecolor}}
-                                                        value={course.coursename}
-                                                        onClick={this.onChangeCurrentTaskCourse}
-                                                    >
-                                                    {course.coursename}
-                                                    </button>)}
+                                                {this.state.userCourses.map(course =>
+                                                    <div key={course._id} className={course.active ? "courseTag mr-2 activeCourse" : "courseTag mr-2"}
+                                                        style={{backgroundColor: course.coursecolor}} >
+                                                        <button type="button"
+                                                            className="courseTagButton" 
+                                                            style={{backgroundColor: course.coursecolor}}
+                                                            value={course.coursename}
+                                                            onClick={this.onChangeCurrentTaskCourse}
+                                                        >
+                                                        {course.coursename}
+                                                        </button>
+                                                        <button type="button" className="close" onClick={() => this.onRemoveCourse(course._id)}>&times;</button>
+                                                    </div> )}
                                             </div>
                                         </div>
                                         <div className="row">

@@ -159,11 +159,18 @@ router.post('/add-course', auth, async (req, res) => {
     try{
         const courseToAdd = {coursename: req.body.newCourse, coursecolor: req.body.newCourseColor};
         if(req.body.newCourse){
-            const user = await Users.findByIdAndUpdate(
+            await Users.findByIdAndUpdate(
                 { _id: req.user },
                 { $addToSet: {courses: courseToAdd} },
                 { upsert: true }
-            );
+            )
+
+            // Return newly added course
+            await Users.findById(req.user)
+            .then(user => {
+                let coursesLength = user.courses.length;
+                res.json(user.courses[coursesLength-1]);
+            })
         }
     }
     catch(err){
@@ -173,12 +180,12 @@ router.post('/add-course', auth, async (req, res) => {
 });
 
 
-router.delete('/remove-course/:course', auth, async (req, res) => {
+router.delete('/remove-course/:id', auth, async (req, res) => {
     try{
-        if(req.params.course){
+        if(req.params.id){
             const user = await Users.findByIdAndUpdate(
                 { _id: req.user },
-                { $pull: {courses: {coursename: req.params.course}} }
+                { $pull: {courses: {_id: req.params.id}} }
             );
         }
     }
