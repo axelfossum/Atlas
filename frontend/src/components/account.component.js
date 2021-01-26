@@ -105,7 +105,7 @@ export default function Account(){
                         <button className="btn btn-purple btn px-3 ml-2 float-right">Add</button> 
                     </form>
                     <div className="overflow-scroll">
-                        {userData && userData.courses.map(course => <Course key={course} title={course} removeCourse={onRemoveCourse} editCourse={toggleModal}/>)}
+                        {userData && userData.courses.map(course => <Course key={course._id} title={course.coursename} removeCourse={onRemoveCourse} editCourse={toggleModal}/>)}
                     </div>
                 </div>
             </div>

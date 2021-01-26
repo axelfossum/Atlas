@@ -131,11 +131,45 @@ h1, h2, h3 {
 */
 
 .newCourseModal {
-    margin-top: 10%;
+    margin-top: 8%;
 }
 
 .newCourseModal .modal-content {
     -webkit-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.1);
     -moz-box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.1);
     box-shadow: 0px 0px 10px 5px rgba(0,0,0,0.1);
+}
+
+.courseTag {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 5px 10px 5px 10px;
+    border-radius: 15px;
+    outline: none;
+    border: 0;
+    color: white;
+}
+
+.courseTag:hover {
+    filter: brightness(95%);
+}
+
+.activeCourse {
+    margin-bottom: -3px;
+    border-bottom: 3px solid rgba(0,0,0,0.3);
+}
+
+.new-course-error {
+    font-size: 13px;
+    color: red;
+}
+
+.new-course-error button {
+    font-size: 16px;
+    color: red;
+    background: none;
+    border: none;
+    margin: 0 0 0 5px;
+    padding: 0;
+    outline: none;
 }
