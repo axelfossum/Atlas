@@ -11,7 +11,7 @@ import { TwitterPicker } from 'react-color';
 const Task = props => {
 
     return (
-            <div className="card mr-4 my-3 col-md-3 shadow">
+            <div className="card mr-4 my-3 col-md-3 shadow" style={{ border: '1px solid ' + props.task.coursecolor }}>
                 <div className="card-body">
                     <div className="row">
                         <div className="col-10">
