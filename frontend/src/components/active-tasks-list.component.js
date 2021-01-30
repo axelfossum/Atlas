@@ -51,9 +51,9 @@ export default class ActiveTasksList extends Component {
             userCourses: [],
             currentTask_id: '',
             currentTaskTitle: '',
-            currentTaskCourse: '',
+            currentTaskCourse: undefined,
             currentTaskDescription: '',
-            currentTaskCourseColor: '',
+            currentTaskCourseColor: '#ABB8C3',
             currentTaskDeadline: new Date(),
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
@@ -216,7 +216,7 @@ export default class ActiveTasksList extends Component {
         this.setState({
             currentTask_id: '',
             currentTaskTitle: '',
-            currentTaskCourse: this.state.userCourses[0],
+            currentTaskCourse: undefined,
             currentTaskCourseColor: '',
             currentTaskDescription: '',
             currentTaskDeadline: new Date(),
@@ -232,8 +232,8 @@ export default class ActiveTasksList extends Component {
 
     onChangeCurrentTaskCourse(coursename){
 
-        // IF coursename = '' then it means we simply want to de-highlight ALL courses, update state, then return.
-        if(coursename === '') {
+        // IF coursename = '' OR = 'No course' then it means we simply want to de-highlight ALL courses, update state, then return.
+        if(coursename === '' || coursename === 'No course') {
             this.setState({ userCourses: this.dehighlightCourses(this.state.userCourses) });
             return;
         }
