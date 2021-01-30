@@ -16,7 +16,10 @@ const Task = props => {
                     <div className="row">
                         <div className="col-10">
                             <h5 className="card-title">{props.task.title}</h5>
-                            <h6 className="card-subtitle mb-2 text-muted">{props.task.course}</h6>
+                            <h6 className="card-subtitle mb-2 text-muted">
+                                <span style={{ color: props.task.coursecolor }}>■</span>&nbsp;
+                                {props.task.course}
+                            </h6>
                             <h6 className="card-subtitle mb-2 text-muted">{props.task.deadline.substring(0,10) + " " + props.task.deadline.substring(11,16)}</h6>
                         </div>
                         <div className="col-2">
@@ -50,12 +53,13 @@ export default class ActiveTasksList extends Component {
             currentTaskTitle: '',
             currentTaskCourse: '',
             currentTaskDescription: '',
+            currentTaskCourseColor: '',
             currentTaskDeadline: new Date(),
             addingNewTask: false,
             timezoneOffset: new Date().getTimezoneOffset()*60*1000,
             isLoggedIn: false,
             showAddNewCourse: false,
-            newCourseColor: '#922585',
+            newCourseColor: '#ABB8C3',
             newCourse: '',
             error: undefined,
             newCourseError: undefined,
@@ -88,6 +92,7 @@ export default class ActiveTasksList extends Component {
             });
         }
 
+        // Get all unfinished tasks and store them in state 'tasks'
         axios.get('http://localhost:5000/sortByDate', { headers: {'x-auth-token': token} })
             .then(response => {
                 this.setState({
@@ -99,15 +104,28 @@ export default class ActiveTasksList extends Component {
                 console.log(err);
             });
 
+        // Get all courses that the user has listed and store them in state 'userCoursres'
         axios.get('http://localhost:5000/user/getuser/', { headers: {'x-auth-token': token} })
             .then(response => {
+
                 const fetchedCourses = response.data.courses;
                 fetchedCourses.map(course => course.active = false);
                 this.setState({ userCourses: fetchedCourses });
+
+                // For every task in state 'tasks', find its course and get the course color code from 'userCourses'
+                // and add it to the task's object
+                let newTasks = this.state.tasks;
+                newTasks.map(task => {
+                    let color = this.state.userCourses.find(course => course.coursename === task.course).coursecolor;
+                    task.coursecolor = color;
+                });
+                this.setState({ tasks: newTasks });
             })
             .catch(err => {
                 console.log(err);
             });
+
+        
     }
 
     toggleDelete(id){
@@ -121,8 +139,13 @@ export default class ActiveTasksList extends Component {
         const token = localStorage.getItem('auth-token');
         axios.get('http://localhost:5000/'+ e, { headers: {'x-auth-token': token} })
         .then(res =>{
+            let sortedTasksList = res.data.filter(el => el.finished === false);
+            sortedTasksList.map(task => {
+                let color = this.state.userCourses.find(course => course.coursename === task.course).coursecolor;
+                task.coursecolor = color;
+            });
             this.setState({
-                tasks: res.data.filter(el => el.finished === false)
+                tasks: sortedTasksList
             })
         })
         .catch(err => {
@@ -165,6 +188,7 @@ export default class ActiveTasksList extends Component {
 
     toggleModal(id){
         if(id !== ''){
+            this.onChangeCurrentTaskCourse(this.state.tasks.find(task => task._id === id).course);
             this.setState({
                 addingNewTask: false,
                 currentTask_id: id,
@@ -174,7 +198,8 @@ export default class ActiveTasksList extends Component {
                 currentTaskDescription: this.state.tasks.find(task => task._id === id).description,
             });
         } else {
-            this.reset()
+            this.onChangeCurrentTaskCourse('');
+            this.reset();
             this.setState({
                 addingNewTask: true
             });
@@ -192,6 +217,7 @@ export default class ActiveTasksList extends Component {
             currentTask_id: '',
             currentTaskTitle: '',
             currentTaskCourse: this.state.userCourses[0],
+            currentTaskCourseColor: '',
             currentTaskDescription: '',
             currentTaskDeadline: new Date(),
             newCourse: ''
@@ -204,19 +230,33 @@ export default class ActiveTasksList extends Component {
         });
     }
 
-    onChangeCurrentTaskCourse(e){
-        const courseIndex = this.state.userCourses.findIndex(course => course.coursename === e.target.value);
-        const courses = this.state.userCourses;
-        if(!courses[courseIndex].active){
-            courses.map(course => course.active = false);
-            courses[courseIndex].active = !courses[courseIndex].active;
-        }
-        
-        this.setState({
-            userCourses: courses,
-            currentTaskCourse: e.target.value
-        });
+    onChangeCurrentTaskCourse(coursename){
 
+        // IF coursename = '' then it means we simply want to de-highlight ALL courses, update state, then return.
+        if(coursename === '') {
+            this.setState({ userCourses: this.dehighlightCourses(this.state.userCourses) });
+            return;
+        }
+
+        const courseIndex = this.state.userCourses.findIndex(course => course.coursename === coursename);
+        let courses = this.state.userCourses;
+
+        // Highlight the selected course, and de-highlight previous selected course.
+        if(!courses[courseIndex].active){
+            courses = this.dehighlightCourses(courses);
+            courses[courseIndex].active = !courses[courseIndex].active;
+
+            this.setState({
+                userCourses: courses,
+                currentTaskCourse: coursename,
+                currentTaskCourseColor: courses[courseIndex].coursecolor
+            });
+        }
+    }
+
+    dehighlightCourses(courseList){
+        courseList.forEach(course => course.active = false);
+        return courseList;
     }
 
     onChangeCurrentTaskDeadline(deadline){
@@ -269,7 +309,6 @@ export default class ActiveTasksList extends Component {
 
         // If user has wished to add a new course, then we must add it to the database
         if(!this.state.newCourseError){
-            console.log('get here');
             const newCourse = {newCourse: this.state.newCourse, newCourseColor: this.state.newCourseColor};    // Must do it like this for backend to work
             axios.post('http://localhost:5000/user/add-course/', newCourse, { headers: {'x-auth-token': token} })
                 .then(res => {
@@ -279,7 +318,6 @@ export default class ActiveTasksList extends Component {
                     prevCourses.push(newAddedCourse);
                     this.setState({ userCourses: prevCourses, showAddNewCourse: !this.state.showAddNewCourse });
                 })
-            console.log('get here 2');
         }
 
     }
@@ -310,7 +348,9 @@ export default class ActiveTasksList extends Component {
             // POST the new task and recieve the db-saved new task with its new id from backend.
             axios.post('http://localhost:5000/add/', task, { headers: {'x-auth-token': token} })
             .then(res => {
-                prevTasks.push(res.data);
+                let newTaskToPush = res.data;
+                newTaskToPush.coursecolor = this.state.currentTaskCourseColor;
+                prevTasks.push(newTaskToPush);
                 this.setState({ tasks: prevTasks, showModal: !this.state.showModal, error: undefined });
             })
             .catch(err => err.response.data.msg && this.setState( {error: err.response.data.msg} ));
@@ -328,9 +368,12 @@ export default class ActiveTasksList extends Component {
             .then(res => {
                 const oldTaskIndex = prevTasks.findIndex(element => element._id === this.state.currentTask_id);
                 prevTasks[oldTaskIndex] = res.data;
+                // When we're changing the task's course, then we want to make sure that the course color is updated in the task as well
+                prevTasks[oldTaskIndex].coursecolor = this.state.currentTaskCourseColor;
                 this.setState({ tasks: prevTasks, showModal: !this.state.showModal, error: undefined });
             })
             .catch(err => err.response.data.msg && this.setState( {error: err.response.data.msg} ));
+
         }
 
     }
@@ -415,7 +458,7 @@ export default class ActiveTasksList extends Component {
                                                             className="courseTagButton" 
                                                             style={{backgroundColor: course.coursecolor}}
                                                             value={course.coursename}
-                                                            onClick={this.onChangeCurrentTaskCourse}
+                                                            onClick={() => this.onChangeCurrentTaskCourse(course.coursename)}
                                                         >
                                                         {course.coursename}
                                                         </button>
