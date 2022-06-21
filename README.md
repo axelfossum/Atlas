@@ -8,4 +8,4 @@ To use atlas you have to create an account and log in to see your saved tasks!
 To run the program first type npm install in the main folder, then cd into backend and frontend and type npm install. Then open a terminal for the frontend and backend respectively where you cd into the respective folder and type npm start.
 
 
-![GIF](https://user-images.githubusercontent.com/61314454/174895578-bc75d6b5-1c06-4f1f-95e8-ce0376bf6890.gif)
+![Uploading Atlas.gif…]()
