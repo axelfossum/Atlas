@@ -9,4 +9,4 @@ To run the program first type npm install in the main folder, then cd into backe
 
 
 
-![Atlas_4](https://user-images.githubusercontent.com/61314454/174895903-b2329dc5-ae43-48db-a973-6b242738b115.gif)
+![Atlas](https://user-images.githubusercontent.com/61314454/174896036-c32822b9-3241-4998-ad7c-42c79d4a186a.gif)
